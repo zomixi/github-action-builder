@@ -1,0 +1,42 @@
+# This is a basic workflow that is manually triggered
+
+name: Build React Native Android
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: "请输入仓库地址"
+        required: true
+      branch:
+        description: "输入构建分支"
+        required: true
+        default: "master"
+
+env:
+  REPOSITORY: ${{ github.event.inputs.repository }}
+  BRANCH: ${{ github.event.inputs.branch }}
+  WORKSPACE: ${{ vars.workspace }}
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        run: |
+          git clone -b $BRANCH --depth 1 --single-branch --no-tags ${{ env.REPOSITORY }} ${{ env.WORKSPACE }}
+
+      - name: Install Dependencies
+        run: cd ${{ env.WORKSPACE }} && npm install --legacy-peer-deps
+
+      - name: Build Android Release
+        run: cd ${{ env.WORKSPACE }} && npm run build
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: ${{ env.WORKSPACE }}/android/app/build/outputs/apk/release/
+
+      - name: Log Artifact Path
+        run: echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
