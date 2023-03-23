@@ -15,7 +15,7 @@ on:
 env:
   REPOSITORY: ${{ github.event.inputs.repository }}
   BRANCH: ${{ github.event.inputs.branch }}
-  WORKSPACE: ${{ vars.workspace }}
+  WORKSPACE: "workspace"
 
 jobs:
   build-android:
